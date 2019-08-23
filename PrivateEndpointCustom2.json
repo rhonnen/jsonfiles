@@ -63,7 +63,7 @@
     "outputs": {
         "networkInterfaceId": {
             "value": "[reference(parameters('privateEndpointId'),parameters('privateEndpointApiVersion')).networkInterfaces[0].id]",
-            "type" : "string"
+            "type" : "string
         }
     }
 }
