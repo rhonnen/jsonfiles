@@ -1,0 +1,68 @@
+ {
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "privateDnsName": {
+            "type": "string"
+        },
+        "privateEndpointLinkName": {
+            "type": "string"
+        },
+        "privateEndpointNicResourceId": {
+            "type": "string"
+        },
+        "virtualNetworkId": {
+            "type": "string"
+        },
+        "tags": {
+            "type": "object"
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Network/privateDnsZones",
+            "apiVersion": "2018-09-01",
+            "name": "[parameters('privateDnsName')]",
+            "location": "global",
+            "tags": "[parameters('tags')]",
+            "properties": {
+            },
+            "resources": [
+                {
+                    "type": "A",
+                    "apiVersion": "2018-09-01",
+                    "name": "[parameters('privateEndpointLinkName')]",
+                    "tags": {
+                    },
+                    "properties": {
+                        "aRecords": [
+                            {
+                                "ipv4Address": "[reference(parameters('privateEndpointNicResourceId'), '2018-10-01').ipConfigurations[0].properties.privateIPAddress]"
+                            }
+                        ],
+                        "ttl": 3600
+                    },
+                    "dependsOn": [
+			"[parameters('privateDnsName')]"
+                    ]
+                },
+                {
+                    "type": "virtualNetworkLinks",
+                    "apiVersion": "2018-09-01",
+                    "name": "privateEndpointVirtualNetworkLink",
+                    "location": "global",
+                    "tags": {},
+                    "properties": {
+                        "virtualNetwork": {
+                            "id": "[parameters('virtualNetworkId')]"
+                        },
+                        "registrationEnabled": false
+                    },
+                    "dependsOn": [
+			"[parameters('privateDnsName')]"
+                    ]
+                }
+            ]
+        }
+    ]
+}
